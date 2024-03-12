@@ -77,3 +77,11 @@ where `-t`: choose from 'normal' for regular adversarial training; 'free' for ad
 
 ## Citation
 To cite our paper:
+```
+@article{xu2023e2e,
+  title={E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning},
+  author={Xu, Wangkun and Wang, Jianhong and Teng, Fei},
+  journal={AAAI24},
+  year={2023}
+}
+```

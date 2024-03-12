@@ -92,6 +92,7 @@ if __name__ == '__main__':
     T_max = config['nn']['T_max']
     min_lr_ratio = config['nn']['min_lr_ratio']
     train_with_test = config['nn']['train_with_test_spo']
+    solver_args = config['nn']['solver_args']
     
     if watch == 'test':
         assert train_with_test == True 
@@ -123,7 +124,11 @@ if __name__ == '__main__':
     else:
         mean = 0
         std = 1
-    net = NN_SPO(model = net, operator=operator, mean = mean, std = std, fix_first_b = fix_first_b) # construct the spo model
+    net = NN_SPO(model = net, operator=operator, mean = mean, std = std, 
+                fix_first_b = fix_first_b,
+                solver_args=solver_args) # construct the spo model
+    print('nn structure')
+    print(net)
     assert net.name == 'NN_SPO'
     
     is_small_size = config['is_small_size']

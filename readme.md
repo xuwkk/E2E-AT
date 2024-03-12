@@ -1,6 +1,6 @@
 # E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning
 
-This is the official repo for the paper *E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning*, to be appeared in AAAI-24. You can find the preprint here.
+This is the official repo for the paper *E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning*, to be appeared in AAAI-24. You can find the preprint [here](https://arxiv.org/abs/2312.10587).
 
 The authors include:
 - Wangkun Xu: Control and Power Research Group, Department of EEE, Imperial College London.
@@ -9,9 +9,7 @@ The authors include:
 
 ## Developing plan
 
-This repo is under development but should contain the main functionality to support the paper results. We are currently working on merging the E2E-AT into a more general code base for reasearches in E2E learning and power system community, to support diverse power system operations, such as stochastic programming, integer programming, etc. 
-
-The functions for certifying the robustness will also come later.
+This repo is under development but should contain the main functionality to support the paper results. We are currently working on merging the E2E-AT into a more general code base for reasearches in E2E learning and power system community, to support diverse power system operations, such as stochastic programming, integer programming, etc. Please stau updated.
 
 ## How it works
 
@@ -38,8 +36,9 @@ Then to generate the dataset used in the paper, run
 ```bash
 python clean_data.py --no_bus 14
 ```
+This will generate the feature and load pairs for each bus in bus-14 system.
 
-We have modified the standard IEEE case files from [pypower](https://github.com/rwl/PYPOWER/tree/master/pypower). The modifications can be found in 'bus_config.json'.
+We have modified the standard IEEE case files from [pypower](https://github.com/rwl/PYPOWER/tree/master/pypower). The modifications can be found in 'config.json'.
 
 ## Training
 
@@ -49,6 +48,8 @@ For clean training using mse loss:
 ```
 python trainer_clean_mse.py
 ```
+
+This will store the best model and also the model that is used to warm start the training with objective-based loss.
 
 For robust training using mse loss (attack on the input only):
 ```
@@ -74,6 +75,8 @@ where `-t`: choose from 'normal' for regular adversarial training; 'free' for ad
 `--eps_input`: the attack strength on the input.
 `--alpha`: the parameter to balance the clean and adversarial training loss.
 
+## Minor settings
+**solver_args**: According to the document of [cvxpylayers](https://github.com/cvxgrp/cvxpylayers), you can change the solver_args in the forward pass of solving the optimization problems. You can change the configs under `"nn:solver_args"`. For example, increase the "eps" can significantly improve the training speed.
 
 ## Citation
 To cite our paper:
@@ -82,6 +85,6 @@ To cite our paper:
   title={E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning},
   author={Xu, Wangkun and Wang, Jianhong and Teng, Fei},
   journal={AAAI24},
-  year={2023}
+  year={2024}
 }
 ```

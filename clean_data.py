@@ -17,7 +17,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--no_bus', type=int, help='number of buses to be selected')
+parser.add_argument('--no_bus', type=int, help='number of buses to be selected', default=14)
 args = parser.parse_args()
 
 SAVE_DIR = f'data/data_case{args.no_bus}/'
@@ -67,12 +67,15 @@ for i in trange(1, NO_DAY+1, desc='Loading climate data'):
         for index, bus in enumerate(BUS_INDEX):
             climate_dict[bus] = pd.concat([climate_dict[bus], climate_data_per_hour.iloc[bus-1:bus]], ignore_index=True, axis=0)
 
+climate_data_stats = {}
 # remove bus index and normalize the climate data
 for bus in BUS_INDEX:
     climate_dict[bus].drop(columns=['Bus'], inplace=True)
     # min max normalization
     climate_dict[bus] = (climate_dict[bus] - climate_dict[bus].min()) / (climate_dict[bus].max() - climate_dict[bus].min())
-    
+
+    climate_data_stats[bus] = {'mean': climate_dict[bus].mean().values, 'std': climate_dict[bus].std().values}
+
     # standardization
     # climate_dict[bus] = (climate_dict[bus] - climate_dict[bus].mean()) / climate_dict[bus].std()
 
@@ -113,4 +116,11 @@ if not os.path.exists(SAVE_DIR):
     
 for bus in BUS_INDEX:
     climate_dict[bus].to_csv(SAVE_DIR + f'bus_{bus}.csv', index=False)
+
+keys = sorted(list(climate_data_stats.keys()))
+climate_data_stats_ = {}
+for key in keys:
+    climate_data_stats_[key] = climate_data_stats[key]
+
+np.save(SAVE_DIR + 'climate_data_stats.npy', climate_data_stats_, allow_pickle=True)
 

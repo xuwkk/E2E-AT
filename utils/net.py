@@ -48,7 +48,7 @@ class DISPATCH(nn.Module):
     differentiable convex layer for the dispatch problem
     not trainable
     """
-    def __init__(self, operator, fix_first_b, mean, std):
+    def __init__(self, operator, fix_first_b, mean, std, solver_args = None):
         super().__init__()
         self.layer = CvxpyLayer(operator.prob_1,
                 parameters = operator.prob_1.parameters(),
@@ -58,14 +58,17 @@ class DISPATCH(nn.Module):
         self.fix_first_b = fix_first_b
         self.mean = mean
         self.std = std
+        self.solver_args = solver_args
         
     def forward(self, load_forecast, b = None):
         # load: forecast load which should NOT be normalized
         load_forecast = relu(load_forecast * self.std + self.mean)
         if self.fix_first_b:
-            pg = self.layer(self.b_default.repeat(load_forecast.shape[0], 1), load_forecast)[0]
+            pg = self.layer(self.b_default.repeat(load_forecast.shape[0], 1), load_forecast,
+                            solver_args = self.solver_args)[0]
         else:
-            pg = self.layer(b, load_forecast)[0]
+            pg = self.layer(b, load_forecast,
+                            solver_args = self.solver_args)[0]
         
         return pg
 
@@ -74,7 +77,7 @@ class REDISPATCH(nn.Module):
     differentiable convex layer for the redispatch problem
     not trainable
     """
-    def __init__(self, operator, mean, std):
+    def __init__(self, operator, mean, std, solver_args):
         super().__init__()
         self.layer = CvxpyLayer(operator.prob_2,
                 parameters = operator.prob_2.parameters(),
@@ -82,22 +85,24 @@ class REDISPATCH(nn.Module):
                 )
         self.mean = mean
         self.std = std
+        self.solver_args = solver_args
         
     def forward(self, pg, load_true, b):
         # load_shedding, generator_storage
         load_true = load_true * self.std + self.mean
-        output = self.layer(b, pg, load_true)
+        output = self.layer(b, pg, load_true, solver_args = self.solver_args)
         return output[0], output[1]
 
 class SPO(nn.Module):
     """
     sequential differentiable convex layer for both dispatch and redispatch problems
     not trainable
+    this layer is not trainable
     """
-    def __init__(self, operator, fix_first_b, mean, std):
+    def __init__(self, operator, fix_first_b, mean, std, solver_args):
         super().__init__()
-        self.dispatch = DISPATCH(operator, fix_first_b, mean, std)
-        self.redispatch = REDISPATCH(operator, mean, std)
+        self.dispatch = DISPATCH(operator, fix_first_b, mean, std, solver_args=solver_args)
+        self.redispatch = REDISPATCH(operator, mean, std, solver_args=solver_args)
     
     def forward(self, load_forecast, load_true, b):
         pg = self.dispatch(load_forecast, b)
@@ -107,14 +112,14 @@ class SPO(nn.Module):
 class NN_SPO(nn.Module):
     # model for one-stage training
     # the target is not scaled
-    def __init__(self, model, operator, mean, std, fix_first_b):
+    def __init__(self, model, operator, mean, std, fix_first_b, solver_args = None):
         
         super().__init__()
         self.name = "NN_SPO"
         self.mean = mean
         self.std = std
         self.nn_model = deepcopy(model)
-        self.spo = SPO(operator, fix_first_b, mean, std)
+        self.spo = SPO(operator, fix_first_b, mean, std, solver_args)
         
     def forward(self, feature, target, b):
         # brief introduction of the model
@@ -176,6 +181,7 @@ def bound_propagation(model, initial_bound):
 def form_milp(model, initial_bounds):
     """
     form an MILP problem to minimize the forecast load (which can trigger load shedding)
+    so that the overall cost can be significantly increased
     """
     
     # bound propagation

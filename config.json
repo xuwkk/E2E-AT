@@ -46,7 +46,10 @@
         "train_with_test_spo": true,
         "T_max": 32,
         "min_lr_ratio": 0.01,
-        "gradient_clip_norm": 10
+        "gradient_clip_norm": 10,
+        "solver_args": {
+            "eps": 1e-5
+        }
     },
     "attack": {
         "no_iter": 7,

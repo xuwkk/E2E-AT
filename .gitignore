@@ -2,6 +2,8 @@
 data/data_case14
 data/Data_public
 data/raw_data.zip
+*.ipynb
+*.out
 
 *.pth
 

@@ -88,6 +88,7 @@ class MyDataset(Dataset):
         
         DATA_DIR = f'data/data_{case_name}/'
         FILE_NAME = listdir(DATA_DIR)
+        FILE_NAME = [file_name for file_name in FILE_NAME if file_name.split('.')[-1] == 'csv']
         FILE_NAME = sorted(FILE_NAME, key = lambda x: int(x.split('_')[1].split('.')[0]))[:self.no_load]
         
         TRAIN_DATA = []
@@ -129,7 +130,8 @@ class MyDataset(Dataset):
         self.target = torch.tensor(target).float()
         
         if exp_dim:
-            self.feature = self.feature[:,None,:,:] # add None to make it (batch_size, 1, no_bus, no_feature)
+            # expand dimension
+            self.feature = self.feature[:,None,:,:]
         
         # scale
         # the feature has already been scaled

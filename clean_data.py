@@ -72,10 +72,9 @@ climate_data_stats = {}
 for bus in BUS_INDEX:
     climate_dict[bus].drop(columns=['Bus'], inplace=True)
     # min max normalization
+    climate_data_stats[bus] = {'min': climate_dict[bus].min().values, 'max': climate_dict[bus].max().values}
     climate_dict[bus] = (climate_dict[bus] - climate_dict[bus].min()) / (climate_dict[bus].max() - climate_dict[bus].min())
-
-    climate_data_stats[bus] = {'mean': climate_dict[bus].mean().values, 'std': climate_dict[bus].std().values}
-
+    
     # standardization
     # climate_dict[bus] = (climate_dict[bus] - climate_dict[bus].mean()) / climate_dict[bus].std()
 

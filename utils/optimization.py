@@ -245,7 +245,11 @@ class Operator:
             
             # self.prob.parameters()[0].value = load_forecast_
             # self.prob.parameters()[1].value = b
-            self.prob_1.solve(solver = cp.GUROBI, verbose = False)
+            try:
+                self.prob_1.solve(solver = cp.GUROBI, verbose = False)
+            except:
+                self.prob_1.solve(verbose = False)
+        
             p.append(self.prob_1.variables()[0].value)
             s.append(self.prob_1.variables()[1].value)
             theta.append(self.prob_1.variables()[2].value)
@@ -279,7 +283,10 @@ class Operator:
                 else:
                     raise ValueError("unknown parameter")
             
-            self.prob_2.solve(solver = cp.GUROBI, verbose = False)
+            try:
+                self.prob_2.solve(solver = cp.GUROBI, verbose = False)
+            except:
+                self.prob_2.solve(verbose = False)
             ls.append(self.prob_2.variables()[0].value)
             gs.append(self.prob_2.variables()[1].value)
             theta.append(self.prob_2.variables()[2].value)

@@ -2,6 +2,8 @@
 
 This is the official repo for the paper *E2E-AT: A Unified Framework for Tackling Uncertainty in Task-aware End-to-end Learning*, to be appeared in AAAI-24. You can find the preprint [here](https://arxiv.org/abs/2312.10587).
 
+<img src="repo_src/e2e_flowchart.png" width="600">
+
 The authors include:
 - Wangkun Xu: Control and Power Research Group, Department of EEE, Imperial College London.
 - Dr. Jianhong Wang: University of Manchester.
@@ -74,6 +76,11 @@ where `-t`: choose from 'normal' for regular adversarial training; 'free' for ad
 `--eps_parameter`: the attack strength on the parameter (in ratio, e.g. 0.1)
 `--eps_input`: the attack strength on the input.
 `--alpha`: the parameter to balance the clean and adversarial training loss.
+
+To certify the input space attack:
+```
+python exp_certify.py -t spo_clean --eps_input 0.005
+```
 
 ## Minor settings
 **solver_args**: According to the document of [cvxpylayers](https://github.com/cvxgrp/cvxpylayers), you can change the solver_args in the forward pass of solving the optimization problems. You can change the configs under `"nn:solver_args"`. For example, increase the "eps" can significantly improve the training speed.
